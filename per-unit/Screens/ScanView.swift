@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ScanView: View {
+    @State private var viewModel = ViewModel()
+    
     var body: some View {
-        Text("This is scan view!")
+        CameraView(image: $viewModel.currentFrame)
     }
 }
 
