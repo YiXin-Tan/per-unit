@@ -34,10 +34,12 @@ struct Product: Identifiable {
     }
 }
 
-enum Unit {
-    case kg
-    case g
-    case ml
-    case l
-    case ea
+enum Unit: String, CaseIterable, Identifiable {
+    case kg = "kg"
+    case g = "g"
+    case ml = "ml"
+    case l = "l"
+    case ea = "ea"
+    
+    var id: String { rawValue }
 }

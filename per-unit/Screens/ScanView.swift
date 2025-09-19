@@ -9,22 +9,31 @@ import SwiftUI
 
 struct ScanView: View {
     @State private var viewModel = ViewModel()
+    @State var isShowingProductDetail: Bool = false
     
     var body: some View {
-        CameraView(image: $viewModel.currentFrame)
-        
-        
-        Button {
-            print("Capture Button Pressed!")
-        } label: {
-            Label("Scan", systemImage: "camera.shutter.button.fill")
+        NavigationStack {
+            VStack {
+                CameraView(image: $viewModel.currentFrame)
+                Button {
+                    print("Capture Button Pressed!")
+                    isShowingProductDetail = true
+                } label: {
+                    Label("Scan", systemImage: "camera.shutter.button.fill")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .foregroundColor(.white)
+                .tint(.red)
+                
+                Text(Product.displayUnitPrice(product: MockData.sampleProduct))
+
+            }.navigationTitle("Scan")
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .foregroundColor(.white)
-        .tint(.red)
-        
-        Text(Product.displayUnitPrice(product: MockData.sampleProduct))
+        .sheet(
+            isPresented: $isShowingProductDetail,
+            content: { ProductDetailView(product: .constant(MockData.sampleProduct))}
+        )
     }
 }
 
