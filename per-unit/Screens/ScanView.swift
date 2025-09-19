@@ -12,6 +12,19 @@ struct ScanView: View {
     
     var body: some View {
         CameraView(image: $viewModel.currentFrame)
+        
+        
+        Button {
+            print("Capture Button Pressed!")
+        } label: {
+            Label("Scan", systemImage: "camera.shutter.button.fill")
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .foregroundColor(.white)
+        .tint(.red)
+        
+        Text(Product.displayUnitPrice(product: MockData.sampleProduct))
     }
 }
 

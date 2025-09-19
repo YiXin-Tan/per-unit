@@ -14,11 +14,3 @@ struct Category: Identifiable {
     // TODO var reference to nested products?
 }
 
-struct MockData {
-    static let sampleCategories: [Category] = [
-        Category(name: "Toilet paper"),
-        Category(name: "Shapoo"),
-        Category(name: "Toothbrush"),
-        Category(name: "Coconut milk"),
-        ]
-}
