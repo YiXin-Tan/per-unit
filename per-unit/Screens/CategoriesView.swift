@@ -9,7 +9,14 @@ import SwiftUI
 
 struct CategoriesView: View {
     var body: some View {
-        Text("This is categories view!")
+        NavigationStack {
+            VStack {
+                // TODO: search and filter
+                
+                CategoriesTableView()
+            }
+            .navigationTitle("Categories")
+        }
     }
 }
 
