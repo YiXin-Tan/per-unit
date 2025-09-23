@@ -18,6 +18,7 @@ class CameraManager: NSObject {
     private var videoOutput: AVCaptureVideoDataOutput?
     private var photoOutput: AVCapturePhotoOutput?
     private var photoSettings: AVCapturePhotoSettings?
+    private var currentPhotoProcessor: PhotoCaptureProcessor?
     // 4.
     private let systemPreferredCamera = AVCaptureDevice.default(for: .video)
     // 5.
@@ -81,11 +82,11 @@ class CameraManager: NSObject {
         let videoOutput = AVCaptureVideoDataOutput()
         let photoOutput = AVCapturePhotoOutput()
         
-        if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
-            let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-        } else {
-            let photoSettings = AVCapturePhotoSettings()
-        }
+        // Store outputs and settings as instance variables
+        self.videoOutput = videoOutput
+        self.photoOutput = photoOutput
+        
+        // Note: Photo settings will be created fresh for each capture to avoid reuse error
 //        photoSettings.flashMode = .auto
 
         videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
@@ -103,15 +104,27 @@ class CameraManager: NSObject {
         }
         
         guard captureSession.canAddOutput(photoOutput) else {
-            print("Unable to add photo output to capture session")
+            print("❌ Unable to add photo output to capture session")
             return
         }
+        
+        print("✅ Photo output can be added to capture session")
         
         // 7.
         captureSession.addInput(deviceInput)
         captureSession.addOutput(videoOutput)
-        captureSession.sessionPreset = .photo
         captureSession.addOutput(photoOutput)
+        
+        // Set session preset after adding outputs
+        if captureSession.canSetSessionPreset(.photo) {
+            captureSession.sessionPreset = .photo
+            print("✅ Session preset set to .photo")
+        } else {
+            print("⚠️ Cannot set session preset to .photo, using default")
+        }
+        
+        print("📸 CameraManager: Photo output added to capture session")
+        print("📸 CameraManager: Photo output isRunning: \(captureSession.isRunning)")
         
     }
 
@@ -120,9 +133,13 @@ class CameraManager: NSObject {
 
     private func startSession() async {
         /// Checking authorization
-        guard await isAuthorized else { return }
+        guard await isAuthorized else { 
+            print("❌ CameraManager: Not authorized to use camera")
+            return 
+        }
         /// Start the capture session flow of data
         captureSession.startRunning()
+        print("📸 CameraManager: Capture session started")
     }
     
     private func stopSession() async {
@@ -144,14 +161,55 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     
 }
 
-extension CameraManager: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingPhoto photo: AVCapturePhoto,
-                     error: Error?) {
-        guard let cgImage = photo.cgImageRepresentation() else { return }
-        // Now you have a still image (CGImage).
+extension CameraManager {
+    func capturePhoto(completion: @escaping (CGImage?) -> Void) {
+        guard let photoOutput else { 
+            print("❌ Photo output is nil")
+            completion(nil)
+            return 
+        }
+
+        print("📸 Capture session isRunning: \(captureSession.isRunning)")
+        print("📸 Photo output connections: \(photoOutput.connections.count)")
+        print("📸 Available photo codec types: \(photoOutput.availablePhotoCodecTypes)")
+
+        // Ensure we're on the session queue for photo capture
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Create fresh photo settings each time to avoid reuse error
+            // Use default settings for maximum compatibility
+            let photoSettings = AVCapturePhotoSettings()
+            print("📸 Using default photo settings")
+            
+            // Enable high resolution photos if supported
+            if photoOutput.isHighResolutionCaptureEnabled {
+                photoSettings.isHighResolutionPhotoEnabled = true
+                print("📸 High resolution photos enabled")
+            }
+            
+            print("📸 Photo settings created: \(photoSettings)")
+
+            let processor = PhotoCaptureProcessor { [weak self] cgImage in
+                self?.currentPhotoProcessor = nil // Clear the reference when done
+                completion(cgImage)
+            }
+            
+            // Store the processor to prevent deallocation
+            self.currentPhotoProcessor = processor
+            
+            print("📸 Starting photo capture on session queue...")
+            photoOutput.capturePhoto(with: photoSettings, delegate: processor)
+            
+            // Add a timeout to detect if delegate never gets called
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                print("⚠️ Photo capture timeout - delegate may not have been called")
+            }
+        }
     }
 }
+
+
 
 
 // REFERENCES

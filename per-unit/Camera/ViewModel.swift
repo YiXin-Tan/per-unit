@@ -13,6 +13,8 @@ import Observation
 @Observable
 class ViewModel {
     var currentFrame: CGImage?
+    var capturedImage: CGImage?
+    var recognizedText: [String] = []
     private let cameraManager = CameraManager()
     
     init() {
@@ -20,10 +22,22 @@ class ViewModel {
             await handleCameraPreviews()
         }
     }
+    
     func handleCameraPreviews() async {
         for await image in cameraManager.previewStream {
             Task { @MainActor in
                 currentFrame = image
+            }
+        }
+    }
+    
+    func capturePhoto() {
+        print("📸 ViewModel: capturePhoto() called")
+        cameraManager.capturePhoto { [weak self] cgImage in
+            Task { @MainActor in
+                print("📸 ViewModel: Received CGImage from CameraManager: \(cgImage != nil ? "✅" : "❌")")
+                self?.capturedImage = cgImage
+                // The OCR will be handled automatically by PhotoCaptureProcessor
             }
         }
     }

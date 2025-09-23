@@ -17,6 +17,7 @@ struct ScanView: View {
                 CameraView(image: $viewModel.currentFrame)
                 Button {
                     print("Capture Button Pressed!")
+                    viewModel.capturePhoto()
                     isShowingProductDetail = true
                 } label: {
                     Label("Scan", systemImage: "camera.shutter.button.fill")
