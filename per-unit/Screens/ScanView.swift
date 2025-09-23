@@ -18,6 +18,13 @@ struct ScanView: View {
                 Button {
                     print("Capture Button Pressed!")
                     isShowingProductDetail = true
+                    viewModel.captureAndRecognizeText { recognizedStrings in
+                        print("Recognized text: \(recognizedStrings)")
+                        // here you could parse recognizedStrings into Product model
+                        DispatchQueue.main.async {
+                            isShowingProductDetail = true
+                        }
+                    }
                 } label: {
                     Label("Scan", systemImage: "camera.shutter.button.fill")
                 }
