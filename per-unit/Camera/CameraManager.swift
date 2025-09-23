@@ -16,6 +16,8 @@ class CameraManager: NSObject {
     private var deviceInput: AVCaptureDeviceInput?
     // 3.
     private var videoOutput: AVCaptureVideoDataOutput?
+    private var photoOutput: AVCapturePhotoOutput?
+    private var photoSettings: AVCapturePhotoSettings?
     // 4.
     private let systemPreferredCamera = AVCaptureDevice.default(for: .video)
     // 5.
@@ -77,6 +79,15 @@ class CameraManager: NSObject {
         
         // 4.
         let videoOutput = AVCaptureVideoDataOutput()
+        let photoOutput = AVCapturePhotoOutput()
+        
+        if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+            let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        } else {
+            let photoSettings = AVCapturePhotoSettings()
+        }
+//        photoSettings.flashMode = .auto
+
         videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
         
         // 5.
@@ -91,9 +102,16 @@ class CameraManager: NSObject {
             return
         }
         
+        guard captureSession.canAddOutput(photoOutput) else {
+            print("Unable to add photo output to capture session")
+            return
+        }
+        
         // 7.
         captureSession.addInput(deviceInput)
         captureSession.addOutput(videoOutput)
+        captureSession.sessionPreset = .photo
+        captureSession.addOutput(photoOutput)
         
     }
 
@@ -107,6 +125,12 @@ class CameraManager: NSObject {
         captureSession.startRunning()
     }
     
+    private func stopSession() async {
+        /// Checking authorization
+        guard await isAuthorized else { return }
+        /// Stop the capture session flow of data
+        captureSession.stopRunning()
+    }
 }
 
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -120,6 +144,16 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     
 }
 
+extension CameraManager: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput,
+                     didFinishProcessingPhoto photo: AVCapturePhoto,
+                     error: Error?) {
+        guard let cgImage = photo.cgImageRepresentation() else { return }
+        // Now you have a still image (CGImage).
+    }
+}
+
 
 // REFERENCES
 // https://www.createwithswift.com/camera-capture-setup-in-a-swiftui-app/
+// https://developer.apple.com/documentation/avfoundation/capture-setup

@@ -12,6 +12,7 @@ struct ProductDetailView: View {
     @Binding var product: Product
 
     var body: some View {
+        // TODO: persist data
         Form {
             Section(header: Text("Product Details")) {
                 LabeledContent {
