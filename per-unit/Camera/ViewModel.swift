@@ -33,12 +33,12 @@ class ViewModel {
     
     func capturePhoto() {
         print("📸 ViewModel: capturePhoto() called")
-        cameraManager.capturePhoto { [weak self] cgImage in
+        cameraManager.capturePhoto(completion: { [weak self] cgImage in
             Task { @MainActor in
                 print("📸 ViewModel: Received CGImage from CameraManager: \(cgImage != nil ? "✅" : "❌")")
                 self?.capturedImage = cgImage
                 // The OCR will be handled automatically by PhotoCaptureProcessor
             }
-        }
+        })
     }
 }
