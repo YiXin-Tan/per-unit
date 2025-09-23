@@ -14,7 +14,8 @@ import Observation
 class ViewModel {
     var currentFrame: CGImage?
     var capturedImage: CGImage?
-    var recognizedText: [String] = []
+    var recognisedText: [String] = []
+    var lastRecognisedText: [String] = [] // Stores the most recent OCR results
     private let cameraManager = CameraManager()
     
     init() {
@@ -33,11 +34,14 @@ class ViewModel {
     
     func capturePhoto() {
         print("📸 ViewModel: capturePhoto() called")
-        cameraManager.capturePhoto(completion: { [weak self] cgImage in
+        cameraManager.capturePhoto(completion: { [weak self] cgImage, recognisedText in
             Task { @MainActor in
                 print("📸 ViewModel: Received CGImage from CameraManager: \(cgImage != nil ? "✅" : "❌")")
                 self?.capturedImage = cgImage
+                self?.lastRecognisedText = recognisedText
                 // The OCR will be handled automatically by PhotoCaptureProcessor
+                // and the recognised text will be stored in lastRecognisedText
+
             }
         })
     }

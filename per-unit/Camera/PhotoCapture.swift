@@ -11,9 +11,9 @@ import Vision
 import CoreImage
 
 class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
-    private let completion: (CGImage?) -> Void
+    private let completion: (CGImage?, [String]) -> Void
     
-    init(completion: @escaping (CGImage?) -> Void) {
+    init(completion: @escaping (CGImage?, [String]) -> Void) {
         self.completion = completion
         super.init()
     }
@@ -23,44 +23,45 @@ class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
         
         if let error = error {
             print("❌ Error capturing photo: \(error)")
-            completion(nil)
+            completion(nil, [])
             return
         }
         
         guard let cgImage = photo.cgImageRepresentation() else {
             print("❌ Unable to get CGImage from photo")
-            completion(nil)
+            completion(nil, [])
             return
         }
         
         print("✅ Successfully captured CGImage: \(cgImage.width)x\(cgImage.height)")
         
         // Run OCR on the captured image
-        runOCR(cgImage: cgImage)
-        
-        // Pass the CGImage to the completion handler
-        completion(cgImage)
+        runOCR(cgImage: cgImage, completion: { [weak self] recognisedText in
+            // Pass both CGImage and recognised text to completion
+            self?.completion(cgImage, recognisedText) // sends back to CameraManager
+        })
     }
     
-    func runOCR(cgImage: CGImage) {
+    func runOCR(cgImage: CGImage, completion: @escaping ([String]) -> Void) {
         let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-        let request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
+        let request = VNRecognizeTextRequest { [weak self] request, error in
+            guard let observations = request.results as? [VNRecognizedTextObservation] else {
+                completion([])
+                return
+            }
+            let recognisedStrings = observations.compactMap { observation in
+                return observation.topCandidates(1).first?.string
+            }
+            
+            print("📝 Recognised text: \(recognisedStrings)")
+            completion(recognisedStrings)
+        }
 
         do {
             try requestHandler.perform([request])
         } catch {
             print("❌ OCR failed: \(error)")
+            completion([])
         }
-    }
-    
-    func recognizeTextHandler(request: VNRequest, error: Error?) {
-        guard let observations = request.results as? [VNRecognizedTextObservation] else {
-            return
-        }
-        let recognizedStrings = observations.compactMap { observation in
-            return observation.topCandidates(1).first?.string
-        }
-        
-        print("📝 Recognized text: \(recognizedStrings)")
     }
 }

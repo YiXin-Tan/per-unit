@@ -155,11 +155,11 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 extension CameraManager {
     /// Creates PhotoCaptureProcessor(Completion:) for every new image
-    func capturePhoto(completion: @escaping (CGImage?) -> Void) {
-        guard let photoOutput else { 
+    func capturePhoto(completion: @escaping (CGImage?, [String]) -> Void) {
+        guard let photoOutput else {
             print("❌ Photo output is nil")
-            completion(nil)
-            return 
+            completion(nil, [])
+            return
         }
 
         print("📸 Starting photo capture...")
@@ -171,9 +171,9 @@ extension CameraManager {
             let photoSettings = AVCapturePhotoSettings()
             print("📸 Photo settings created: \(photoSettings)")
 
-            let processor = PhotoCaptureProcessor(completion: { [weak self] cgImage in
+            let processor = PhotoCaptureProcessor(completion: { [weak self] cgImage, recognisedText in
                 self?.currentPhotoProcessor = nil // Clear the reference when done
-                completion(cgImage) // sends back to ViewModel
+                completion(cgImage, recognisedText) // sends back to ViewModel
             })
             
             // Store processor to prevent deallocation
