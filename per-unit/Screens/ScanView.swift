@@ -17,6 +17,7 @@ struct ScanView: View {
                 CameraView(image: $viewModel.currentFrame)
                 Button {
                     print("Capture Button Pressed!")
+                    viewModel.capturePhoto()
                     isShowingProductDetail = true
                     viewModel.captureAndRecognizeText { recognizedStrings in
                         print("Recognized text: \(recognizedStrings)")
@@ -39,7 +40,12 @@ struct ScanView: View {
         }
         .sheet(
             isPresented: $isShowingProductDetail,
-            content: { ProductDetailView(product: .constant(MockData.sampleProduct))}
+            content: {
+                ProductDetailView(
+                    product: .constant(MockData.sampleProduct),
+                    recognisedText: viewModel.lastRecognisedText
+                )
+            }
         )
     }
 }
