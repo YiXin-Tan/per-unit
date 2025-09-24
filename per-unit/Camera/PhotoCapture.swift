@@ -10,6 +10,27 @@ import AVFoundation
 import Vision
 import CoreImage
 
+/// ScanView init
+///     ↓
+/// ViewModel.init()
+///     ↓
+/// CameraManager.init()
+///     ↓
+/// configureSession()
+///     ↓
+/// startSession()
+///     ↓
+/// captureOutput() [60 FPS]
+///     ↓
+/// addToPreviewStream()
+///     ↓
+/// continuation.yield()
+///     ↓
+/// handleCameraPreviews()
+///     ↓
+/// currentFrame = image
+///     ↓
+/// SwiftUI updates CameraView
 class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
     private let completion: (CGImage?, [String]) -> Void
     

@@ -9,6 +9,38 @@
 import Foundation
 import AVFoundation
 
+/// CameraManager.init()
+///     ↓
+/// configureSession()
+///     ↓
+/// startSession()
+///     ↓
+/// captureOutput() [60 FPS]
+///     ↓
+/// addToPreviewStream()
+///     ↓
+/// continuation.yield()
+///     ↓
+/// handleCameraPreviews()
+///     ↓
+/// currentFrame = image
+///     ↓
+/// SwiftUI updates CameraView
+/// AVCaptureVideoDataOutput calls captureOutput
+/// ↓
+/// captureOutput called on sessionQueue
+/// ↓
+/// Frame sent to AsyncStream
+/// ↓
+/// ViewModel receives frame on main thread (@MainActor)
+/// ↓
+/// viewModel.currentFrame updates
+/// ↓
+/// SwiftUI detects change (@Observable)
+/// ↓
+/// CameraView.image automatically updates (@Binding)
+/// ↓
+/// CameraView re-renders with new frame
 class CameraManager: NSObject {
     // 1.
     private let captureSession = AVCaptureSession()
@@ -43,6 +75,7 @@ class CameraManager: NSObject {
     
     private var addToPreviewStream: ((CGImage) -> Void)?
     
+    /// Broadcasts frames continuously
     lazy var previewStream: AsyncStream<CGImage> = {
         AsyncStream { continuation in
             addToPreviewStream = { cgImage in
@@ -89,7 +122,7 @@ class CameraManager: NSObject {
         // Note: Photo settings will be created fresh for each capture to avoid reuse error
 //        photoSettings.flashMode = .auto
 
-        videoOutput.setSampleBufferDelegate(self, queue: sessionQueue)
+        videoOutput.setSampleBufferDelegate(self, queue: sessionQueue) // videoOutput (AVCaptureVideoDataOutput) calls the delegate method everytime
         
         // 5.
         guard captureSession.canAddInput(deviceInput) else {
@@ -144,6 +177,7 @@ class CameraManager: NSObject {
 
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     
+    /// Process the frame and send it to the stream
     func captureOutput(_ output: AVCaptureOutput,
                        didOutput sampleBuffer: CMSampleBuffer,
                        from connection: AVCaptureConnection) {

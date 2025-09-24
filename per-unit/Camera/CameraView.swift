@@ -10,7 +10,7 @@ import SwiftUI
 
 struct CameraView: View {
     
-    @Binding var image: CGImage?
+    @Binding var image: CGImage? // Bound to viewModel.currentFrame
     
     var body: some View {
         GeometryReader { geometry in
