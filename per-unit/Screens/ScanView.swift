@@ -13,23 +13,43 @@ struct ScanView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
+            ZStack {
                 CameraView(image: $viewModel.currentFrame)
-                Button {
-                    print("Capture Button Pressed!")
-                    viewModel.capturePhoto()
-                    isShowingProductDetail = true
-                } label: {
-                    Label("Scan", systemImage: "camera.shutter.button.fill")
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .foregroundColor(.white)
-                .tint(.red)
+                    .ignoresSafeArea()
                 
-                Text(Product.displayUnitPrice(product: MockData.sampleProduct))
 
-            }.navigationTitle("Scan")
+                VStack {
+                    Spacer()
+                    
+                    Button {
+                        print("Capture Button Pressed!")
+                        viewModel.capturePhoto()
+                        isShowingProductDetail = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "camera.shutter.button.fill")
+                            Text("Scan")
+                                .fontWeight(.semibold)
+                        }
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 30)
+                        .foregroundColor(.white)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.25))
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 32)
+                }
+
+//                .foregroundColor(.white)
+//                .tint(.red)
+                
+//                Text(Product.displayUnitPrice(product: MockData.sampleProduct))
+
+            }//.navigationTitle("Scan")
         }
         .sheet(
             isPresented: $isShowingProductDetail,
