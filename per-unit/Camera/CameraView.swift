@@ -17,10 +17,11 @@ struct CameraView: View {
             if let image = image {
                 Image(decorative: image, scale: 1)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .rotationEffect(.degrees(90)) // adjust as needed
                     .frame(width: geometry.size.width,
                            height: geometry.size.height)
+                    .clipped()
             } else {
                 ContentUnavailableView("No camera feed", systemImage: "xmark.circle.fill")
                     .frame(width: geometry.size.width,

@@ -173,11 +173,6 @@ class CameraManager: NSObject {
         /// Stop the capture session flow of data
         captureSession.stopRunning()
     }
-    
-    func takePhoto(completion: @escaping (CGImage?) -> Void) {
-        let settings = AVCapturePhotoSettings()
-        photoOutput?.capturePhoto(with: settings, delegate: PhotoCaptureProcessor(completion: completion))
-    }
 }
 
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -221,27 +216,6 @@ extension CameraManager {
             // AVCapturePhotoOutput calls processor.photoOutput(...) after photo is captured
             photoOutput.capturePhoto(with: photoSettings, delegate: processor)
         }
-    }
-}
-
-// Helper delegate object (so multiple captures can work independently)
-private class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
-    let completion: (CGImage?) -> Void
-
-    init(completion: @escaping (CGImage?) -> Void) {
-        self.completion = completion
-    }
-
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingPhoto photo: AVCapturePhoto,
-                     error: Error?) {
-        guard error == nil,
-              let cgImage = photo.cgImageRepresentation()
-        else {
-            completion(nil)
-            return
-        }
-        completion(cgImage)
     }
 }
 
