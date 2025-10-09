@@ -9,14 +9,6 @@ import SwiftUI
 
 struct CategoriesView: View {
     var body: some View {
-        NavigationStack {
-            VStack {
-                // TODO: search and filter
-                
-                CategoriesTableView()
-            }
-            .navigationTitle("Categories")
-        }
     }
 }
 

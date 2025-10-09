@@ -54,10 +54,11 @@ struct ScanView: View {
         .sheet(
             isPresented: $isShowingProductDetail,
             content: {
-                ProductDetailView(
-                    product: .constant(MockData.sampleProduct),
-                    recognisedText: viewModel.lastRecognisedText
-                )
+//                ProductDetailView(
+//                    product: .constant(MockData.sampleProduct),
+//                    recognisedText: viewModel.lastRecognisedText
+//                )
+                ProductDetailView()
             }
         )
     }
