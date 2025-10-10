@@ -35,6 +35,18 @@ extension Category {
             $0.wrappedName < $1.wrappedName
         }
     }
+    
+    static func createNewCategory(
+        name: String,
+        context: NSManagedObjectContext
+    ) {
+        let newCategory = Category(context: context)
+        newCategory.id = UUID()
+        newCategory.name = name
+        newCategory.lastModified = Date()
+        try? context.save()
+    }
+
 }
 
 // MARK: Generated accessors for products

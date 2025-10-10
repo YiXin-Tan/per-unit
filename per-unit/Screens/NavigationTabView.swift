@@ -14,7 +14,7 @@ struct NavigationTabView: View {
                 ProductsView()
             }
 
-            Tab("Categories", systemImage: "rectangle.stack") {
+            Tab("Categories", systemImage: "folder") {
                 CategoriesView()
             }
             

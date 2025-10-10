@@ -13,16 +13,23 @@ struct CategoriesView: View {
     @FetchRequest(sortDescriptors: []) var products: FetchedResults<Product>
 
     var body: some View {
-        List {
-            ForEach(categories, id: \.self) { category in
-                Section(category.wrappedName){
-                    ForEach(category.productArray, id: \.self) { product in
-                        Text(product.wrappedName)
+        NavigationView {
+            List {
+                ForEach(categories, id: \.self) { category in
+                    Section(category.wrappedName){
+                        ForEach(category.productArray, id: \.self) { product in
+                            Text(product.wrappedName)
+                        }
                     }
+                    
                 }
-                
+            }
+            .navigationTitle("Categories")
+            .toolbar{
+                CategoryAddAlertButton()
             }
         }
+
     }
 }
 

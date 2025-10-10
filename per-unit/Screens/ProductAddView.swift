@@ -49,10 +49,14 @@ struct ProductAddView: View {
                 }
                 .pickerStyle(.menu)
                 
-                // TODO: New category button, which shows add category popup
+                CategoryAddAlertButton()
+                
+                // TODO: Automatically select latest category
+                // TODO: Search category?
             }
             
             Section {
+                // TODO: Form validation, ensure no empty fields
                 Button("Save"){
                     Product.createNewProduct(
                         name: name,
