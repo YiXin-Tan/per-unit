@@ -21,6 +21,20 @@ extension Category {
     @NSManaged public var id: UUID?
     @NSManaged public var products: NSSet?
 
+    public var wrappedName: String {
+        name ?? "Unknown Category Name"
+    }
+    
+    public var wrappedLastModified: Date {
+        lastModified ?? Date()
+    }
+    
+    public var productArray: [Product] {
+        let set = products as? Set<Product> ?? []
+        return set.sorted {
+            $0.wrappedName < $1.wrappedName
+        }
+    }
 }
 
 // MARK: Generated accessors for products
