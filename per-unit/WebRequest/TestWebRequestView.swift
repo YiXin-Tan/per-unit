@@ -8,16 +8,22 @@
 import SwiftUI
 
 struct TestWebRequestView: View {
+    @Environment(\.managedObjectContext) var moc
     @State var productData: ProductData?
+    @State var productInfo: ProductInfo?
     var body: some View {
         VStack {
-            Text(productData?.login ?? "Login placeholder")
+            Text(productData?.model ?? "model placeholder")
             
-            Text(productData?.bio ?? "Bio placeholder")
+            Text(productInfo?.productName ?? "product name placeholder")
+            Text("\(productInfo?.price ?? 0.0)")
+            Text("\(productInfo?.amount ?? 0.0)")
+            Text(productInfo?.unit ?? "product unit placeholder")
         }
         .task {
             do {
-                productData = try await getProductDetails()
+                productData = try await getProductDetails(rawText: "$ 599\nWILLOWTON FREE RANGE\nFree Range Fresh Whole Chicken\nper kg\n$5.99 per kg\nD 399578-KGM")
+                productInfo = try productData?.choices[0].message.getProductInfo()
             } catch WebRequestError.invalidURL {
                 print("Invalid URL")
             } catch WebRequestError.invalidResponse {
