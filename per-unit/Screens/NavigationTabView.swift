@@ -26,6 +26,10 @@ struct NavigationTabView: View {
                 TestProductCategoryView()
             }
             
+            Tab("Test Web", systemImage: "hammer"){
+                TestWebRequestView()
+            }
+            
             Tab("Info", systemImage: "gear") {
                 InfoView()
             }
