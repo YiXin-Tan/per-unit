@@ -28,11 +28,12 @@ extension Product {
     public var wrappedName: String {
         name ?? ""
     }
-    public var wrappedPrice: Double {
-        price
+    public var wrappedPrice: String {
+        String(format: "%.2f", price)
+        // return (price * 100).rounded() / 100
     }
-    public var wrappedAmount: Double {
-        amount
+    public var wrappedAmount: String {
+        String(format: "%.0f", amount)
     }
     public var wrappedUnit: String {
         switch unit {
@@ -41,16 +42,32 @@ extension Product {
         case 1:
             return "kg"
         case 2:
-            return "ml"
+            return "mL"
         case 3:
-            return "l"
+            return "L"
         default:
             return "ea"
         }
     }
-    public var wrappedCreated: Date { // TODO: set default date, or format to string
-        created ?? Date()
+    public var wrappedCreated: String {
+        let dateToFormat = created ?? Date()
+        let formatter = DateFormatter()
+        let calendar = Calendar.current
+        
+        if calendar.isDateInToday(dateToFormat) ||
+           calendar.isDate(dateToFormat, equalTo: Date(), toGranularity: .weekOfYear) {
+            // Within the last 7 days (same week)
+            formatter.dateFormat = "EEEE h:mma" // e.g., Monday 3:35PM
+        } else {
+            // Older than 7 days
+            formatter.dateFormat = "d/M/yyyy h:mma" // e.g., 31/7/2025 3:35PM
+        }
+        
+        formatter.amSymbol = "am"
+        formatter.pmSymbol = "pm"
+        return formatter.string(from: dateToFormat)
     }
+    
     public var wrappedLastModified: Date {
         lastModified ?? Date()
     }
@@ -60,13 +77,13 @@ extension Product {
         case 0, 2:
             let rawUnitPrice = self.price / self.amount * 100
             let unitPrice = Double(round(100 * rawUnitPrice) / 100) // round to 2 decimal places
-            return "$\(unitPrice) per 100\(self.wrappedUnit)"
+            return "$\(unitPrice)/100\(self.wrappedUnit)"
         case 1, 3:
             let rawUnitPrice = self.price / self.amount
             let unitPrice = Double(round(100 * rawUnitPrice) / 100)
-            return "$\(unitPrice) per 1\(self.wrappedUnit)"
+            return "$\(unitPrice)/1\(self.wrappedUnit)"
         default:
-            return "$\(self.price) per \(self.wrappedUnit)"
+            return "$\(self.price)/\(self.wrappedUnit)"
         }
 
     }

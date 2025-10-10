@@ -20,10 +20,19 @@ struct ProductsView: View {
             List {
                 ForEach (products) { product in
                     NavigationLink(destination: ProductDetailView()) {
-                        VStack {
-                            Text("\(product.wrappedName)")
+                        VStack(alignment: .leading) {
+                            HStack{
+                                Text("\(product.wrappedName)")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text("\(product.displayUnitPrice())")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+
                             Text("\(product.wrappedAmount)\(product.wrappedUnit)")
-                            Text("\(product.displayUnitPrice())")
                             Text("$\(product.wrappedPrice)")
                             Text("\(product.wrappedCreated)")
                         }
