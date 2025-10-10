@@ -22,8 +22,10 @@ struct TestWebRequestView: View {
         }
         .task {
             do {
-                productData = try await getProductDetails(rawText: "$ 599\nWILLOWTON FREE RANGE\nFree Range Fresh Whole Chicken\nper kg\n$5.99 per kg\nD 399578-KGM")
+                productData = try await getProductData(rawText: "$ 599\nWILLOWTON FREE RANGE\nFree Range Fresh Whole Chicken\nper kg\n$5.99 per kg\nD 399578-KGM")
                 productInfo = try productData?.choices[0].message.getProductInfo()
+                Product.createNewProduct(productData: productData!, context: moc)
+
             } catch WebRequestError.invalidURL {
                 print("Invalid URL")
             } catch WebRequestError.invalidResponse {

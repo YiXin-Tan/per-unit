@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 
-func getProductDetails(rawText: String) async throws -> ProductData {
+func getProductData(rawText: String) async throws -> ProductData {
     let API_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
     let API_KEY = "XXXXXX"
     
@@ -80,6 +81,10 @@ func getProductDetails(rawText: String) async throws -> ProductData {
         print("Decoding error: \(error)")
         throw WebRequestError.invalidData
     }
+}
+
+func joinStringsWithNewlines(_ input: [String]) -> String {
+    return input.joined(separator: "\n")
 }
 
 enum WebRequestError: Error {

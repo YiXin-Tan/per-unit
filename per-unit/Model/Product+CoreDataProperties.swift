@@ -106,6 +106,25 @@ extension Product {
         newProduct.category = category
 
         try? context.save()
+}
+    
+    static func createNewProduct(
+        productData: ProductData,
+        context: NSManagedObjectContext
+    ){
+        do {
+            var productInfo = try productData.choices[0].message.getProductInfo()
+            return Product.createNewProduct(
+                name: productInfo.productName,
+                price: productInfo.price,
+                amount: productInfo.amount,
+                unit: productInfo.unit,
+                category: Category(context: context), // TODO: recognise category
+                context: context
+            )
+        } catch {
+            print(error) // TODO: handle error
+        }
     }
     
     private static func unitIndex(for unit: String) -> Int {

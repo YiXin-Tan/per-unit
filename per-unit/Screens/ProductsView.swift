@@ -10,7 +10,7 @@ import SwiftUI
 struct ProductsView: View {
     @Environment(\.managedObjectContext) var moc
     @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.created)
+        SortDescriptor(\.created, order: .reverse)
     ]) var products: FetchedResults<Product>
     @State private var showAddScreen: Bool = false
 

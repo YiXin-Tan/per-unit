@@ -9,10 +9,13 @@ import SwiftUI
 
 struct ProductDetailView: View {
     
-//    @Binding var product: Product
+//    @Binding var product: Product?
 //    var recognisedText: [String]
 
     var body: some View {
+//        VStack {
+//            Text(product?.name ?? "product name placeholder")
+//        }
         // TODO: persist data
 //        VStack {
 //            Form {
@@ -74,7 +77,7 @@ struct ProductDetailView: View {
     }
 }
 
-#Preview {
-//    ProductDetailView(product: .constant(MockData.sampleProduct), recognisedText: ["str1", "str2"])
-    ProductDetailView()
-}
+//#Preview {
+////    ProductDetailView(product: .constant(MockData.sampleProduct), recognisedText: ["str1", "str2"])
+//    ProductDetailView()
+//}
