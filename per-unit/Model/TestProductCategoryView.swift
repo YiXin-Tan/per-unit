@@ -18,7 +18,7 @@ struct TestProductCategoryView: View {
                 createExampleCategories()
             }
             Button("Create Example Products") {
-                createExampleProducts()
+//                createExampleProducts()
             }
             Button("Delete Everything", role: .destructive) {
                 deleteEverything()
@@ -48,11 +48,11 @@ struct TestProductCategoryView: View {
         category4.name = "Coconut milk"
         category4.lastModified = Date()
         
-        try? moc.save()
-    }
-    
-    
-    func createExampleProducts(){
+//        try? moc.save()
+//    }
+//    
+//    
+//    func createExampleProducts(){
         let product1 = Product(context: moc)
         product1.id = UUID()
         product1.name = "Palmolive Shampoo Argan Oil"
@@ -74,6 +74,8 @@ struct TestProductCategoryView: View {
         product2.lastModified = Date()
         product2.category = Category(context: moc)
         product2.category?.name = "Shampoo"
+        
+        try? moc.save()
     }
     
     func deleteEverything(){

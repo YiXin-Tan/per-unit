@@ -85,7 +85,37 @@ extension Product {
         default:
             return "$\(self.price)/\(self.wrappedUnit)"
         }
+    }
+    
+    static func createNewProduct(
+        name: String,
+        price: Double,
+        amount: Double,
+        unit: String,
+        category: Category,
+        context: NSManagedObjectContext
+    ) {
+        let newProduct = Product(context: context)
+        newProduct.id = UUID()
+        newProduct.name = name
+        newProduct.price = price
+        newProduct.amount = amount
+        newProduct.unit = Int16(unitIndex(for: unit))
+        newProduct.created = Date()
+        newProduct.lastModified = Date()
+        newProduct.category = category
 
+        try? context.save()
+    }
+    
+    private static func unitIndex(for unit: String) -> Int {
+        switch unit {
+        case "g": return 0
+        case "kg": return 1
+        case "ml": return 2
+        case "l": return 3
+        default: return 4
+        }
     }
     
 }

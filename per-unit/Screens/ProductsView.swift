@@ -35,6 +35,7 @@ struct ProductsView: View {
                             Text("\(product.wrappedAmount)\(product.wrappedUnit)")
                             Text("$\(product.wrappedPrice)")
                             Text("\(product.wrappedCreated)")
+                            Text(product.category?.wrappedName ?? "No category name")
                         }
                     }
                 }
@@ -55,6 +56,7 @@ struct ProductsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showAddScreen, content: { ProductAddView() })
         }
     }
     
